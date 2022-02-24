@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Payment.Controllers
+namespace Models
 {
     public class Payment
     {

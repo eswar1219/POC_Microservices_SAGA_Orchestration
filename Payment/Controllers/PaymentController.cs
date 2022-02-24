@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Models;
+using DataBase;
 
 namespace Payment.Controllers
 {
@@ -11,31 +13,37 @@ namespace Payment.Controllers
     public class PaymentController : ControllerBase
     {
 
-        public static List<Payment> userPayments = new List<Payment>();
+        public readonly IPaymentService _data;
+
+        public PaymentController(IPaymentService paymentService)
+        {
+            _data = paymentService;
+        }
+
 
         [HttpGet]
-        public List<Payment> GET()
+        public List<Models.Payment> GET()
         {
-            return userPayments;
+            return _data.GetAll().ToList();
         }
 
         [HttpPost]
-        public Payment Post([FromBody] int userId)
+        public Models.Payment Post([FromBody] UserAccount data)
         {
-            if (userId <= 0)
-                throw new Exception("Payment filed due to invalid user id ");
+            if (data.AccountNumber.Length < 4)
+                throw new Exception("Payment filed due to invalid account number");
 
-            userPayments.Add(new Payment { Id = Guid.NewGuid(), UserId = userId });
+            var payrespo = _data.Insert(new Models.Payment { Id = Guid.NewGuid(), UserId = data.Id });
 
-            return userPayments.Where(x => x.UserId == userId).FirstOrDefault();
+            return payrespo;
         }
 
         [HttpDelete("{id}")]
-        public string Delete([FromBody] Guid id)
+        public string Delete([FromBody] int id)
         {
-            userPayments.RemoveAll(x => x.Id == id);
+            _data.Delete(id);
 
-            return "paymentId: " + id + " details deleted successfully."; ;
+            return "paymentId: " + id + " details deleted successfully.";
         }
     }
 }

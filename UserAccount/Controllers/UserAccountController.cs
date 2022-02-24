@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DataBase;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
+using Models;
 
 namespace UserAccount.Controllers
 {
@@ -9,28 +11,36 @@ namespace UserAccount.Controllers
     public class UserAccountController : Controller
     {
 
-        public static List<UserAccount> userAccounts = new List<UserAccount>();
+        public readonly IUserAccountService _data;
+
+        public UserAccountController(IUserAccountService userService)
+        {
+            _data = userService;
+        }
+
 
         [HttpGet]
-        public List<UserAccount> Get()
+        public List<Models.UserAccount> Get()
         {
-            return userAccounts;
+
+            var data = _data.GetAll().ToList();
+            return data;
         }
 
         [HttpPost]
-        public UserAccount Post([FromBody] UserAccount user)
+        public Models.UserAccount Post([FromBody] Models.UserAccount user)
         {
 
-            userAccounts.Add(user);
+            var userRespo = _data.Insert(user);
 
-            return user;
+            return userRespo;
 
         }
 
         [HttpDelete("{id}")]
         public string Delete(int id)
         {
-            userAccounts.RemoveAll(x => x.Id == id);
+            _data.Delete(id);
 
             return "userId: " + id + " details deleted successfully."; ;
         }

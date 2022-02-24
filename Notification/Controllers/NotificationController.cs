@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using Models;
+using DataBase;
 
 namespace Notification.Controllers
 {
@@ -10,22 +12,29 @@ namespace Notification.Controllers
     public class NotificationController : ControllerBase
     {
 
-        public static List<Notification> _notifications = new List<Notification>();
+
+        public static List<Models.Notification> _notifications = new List<Models.Notification>();
+
+
+        public readonly INotificationService _data;
+
+        public NotificationController(INotificationService notificationService)
+        {
+            _data = notificationService;
+        }
 
         [HttpGet]
-        public List<Notification> Get()
+        public List<Models.Notification> Get()
         {
             return _notifications;
         }
 
         [HttpPost]
-        public string Post([FromBody] string data)
+        public string Post([FromBody] Models.Notification data)
         {
-            var msg = data + "User Creation Process successfully completed";
+            var response = _data.Insert(data);
 
-            _notifications.Add(new Notification { Id = Guid.NewGuid(), Message = msg });
-
-            return msg;
+            return response.Message;
 
         }
 

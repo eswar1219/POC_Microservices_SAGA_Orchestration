@@ -1,4 +1,4 @@
-﻿namespace Orchestrator.Controllers
+﻿namespace Models
 {
     public class AccountResponse
     {
